@@ -1,0 +1,138 @@
+{
+	"name": "blob_logcontainer_ls",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "blob_logcontainer",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@concat('logs_',formatDateTime(addDays(utcNow(),-1), 'yyyy-MM-dd'),'.json')",
+					"type": "Expression"
+				},
+				"container": "logcontainer"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"success": {
+					"type": "boolean"
+				},
+				"logs": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"_id": {
+								"type": "string"
+							},
+							"domain": {
+								"type": "string"
+							},
+							"log_code": {
+								"type": "integer"
+							},
+							"timestamp": {
+								"type": "string"
+							},
+							"extra_info": {
+								"type": "object",
+								"properties": {
+									"application_id": {
+										"type": "string"
+									},
+									"application": {
+										"type": "string"
+									},
+									"user_id": {
+										"type": "string"
+									},
+									"user": {
+										"type": "string"
+									}
+								}
+							},
+							"ip": {
+								"type": "string"
+							}
+						}
+					}
+				},
+				"count": {
+					"type": "integer"
+				},
+				"ADFWebActivityResponseHeaders": {
+					"type": "object",
+					"properties": {
+						"Connection": {
+							"type": "string"
+						},
+						"Date": {
+							"type": "string"
+						},
+						"ETag": {
+							"type": "string"
+						},
+						"Server": {
+							"type": "string"
+						},
+						"X-Powered-By": {
+							"type": "string"
+						},
+						"Content-Length": {
+							"type": "string"
+						},
+						"Content-Type": {
+							"type": "string"
+						}
+					}
+				},
+				"effectiveIntegrationRuntime": {
+					"type": "string"
+				},
+				"executionDuration": {
+					"type": "integer"
+				},
+				"durationInQueue": {
+					"type": "object",
+					"properties": {
+						"integrationRuntimeQueue": {
+							"type": "integer"
+						}
+					}
+				},
+				"billingReference": {
+					"type": "object",
+					"properties": {
+						"activityType": {
+							"type": "string"
+						},
+						"billableDuration": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"meterType": {
+										"type": "string"
+									},
+									"duration": {
+										"type": "number"
+									},
+									"unit": {
+										"type": "string"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

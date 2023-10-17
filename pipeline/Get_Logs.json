@@ -1,0 +1,106 @@
+{
+	"name": "Get_Logs",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetToken",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://sso.gibus.com/oauth2/5aa13ac8c5f095003ff6c4ae/token",
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/x-www-form-urlencoded"
+					},
+					"body": "grant_type=client_credentials&client_id=admin_gibus&client_secret=$OIwT1yV82@6&scope=read_logs",
+					"authentication": {
+						"type": "Basic",
+						"username": "admin_gibus",
+						"password": {
+							"type": "SecureString",
+							"value": "**********"
+						}
+					}
+				}
+			},
+			{
+				"name": "GetLogs",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "GetToken",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@concat(\n  'https://sso.gibus.com/5aa13ac8c5f095003ff6c4ae/admin/log?',\n  'filter[log_code]=4',\n  '&filter_gt[timestamp]=', formatDateTime(adddays(utcnow(),-1), 'yyyy-MM-ddT00:00:00.000Z'),\n  '&filter_lt[timestamp]=', formatDateTime(addminutes(utcnow(), -1), 'yyyy-MM-ddT00:00:00.000Z')\n)",
+						"type": "Expression"
+					},
+					"method": "GET",
+					"headers": {
+						"Authorization": {
+							"value": "@concat('Bearer ',activity('GetToken').output.access_token )",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "BlobWriter",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "GetLogs",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@concat('https://stadevwe.blob.core.windows.net/logcontainer/logs_',formatDateTime(addDays(utcNow(),-1), 'yyyy-MM-dd'),'.json?sp=racwl&st=2023-09-29T13:51:45Z&se=2023-11-29T22:51:45Z&spr=https&sv=2022-11-02&sr=c&sig=LRbE0XOaAY%2B2ZH21%2FuhYLcAIzan3JZ%2BX3h1Ea5QSHYE%3D')",
+						"type": "Expression"
+					},
+					"method": "PUT",
+					"headers": {
+						"x-ms-blob-type": "BlockBlob"
+					},
+					"body": {
+						"value": "@activity('GetLogs').output",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2023-10-01T19:02:46Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,17 @@
+{
+	"name": "adb_logs_ls",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "adb_logs",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "logs"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

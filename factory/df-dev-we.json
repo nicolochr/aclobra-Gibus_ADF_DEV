@@ -1,0 +1,15 @@
+{
+	"name": "df-dev-we",
+	"location": "westeurope",
+	"identity": {
+		"type": "SystemAssigned,UserAssigned",
+		"principalId": "d62fc9e2-05b0-4a4f-a785-a503452b11e4",
+		"tenantId": "3900a527-9340-46c7-986a-f2eba92a90d3",
+		"userAssignedIdentities": {
+			"/subscriptions/b8fb47f1-2263-41bc-851d-92a4a68961f7/resourcegroups/rg-PowerBI-Dev/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mngid-adf-dev": {
+				"clientId": "22b647b5-c54d-45c6-9661-bd1652fa792c",
+				"principalId": "ab465583-b82a-4168-8cd8-6b3a4054c903"
+			}
+		}
+	}
+}

@@ -1,0 +1,79 @@
+{
+	"name": "Flatten_Logs",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "blob_logcontainer_ls",
+						"type": "DatasetReference"
+					},
+					"name": "blobsource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "adb_logs_ls",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flattenlogs"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          success as boolean,",
+				"          logs as ({_id} as string, domain as string, log_code as integer, timestamp as string, extra_info as (application_id as string, application as string, user_id as string, user as string), ip as string)[],",
+				"          count as integer,",
+				"          ADFWebActivityResponseHeaders as (Connection as string, Date as string, ETag as string, Server as string, {X-Powered-By} as string, {Content-Length} as string, {Content-Type} as string),",
+				"          effectiveIntegrationRuntime as string,",
+				"          executionDuration as integer,",
+				"          durationInQueue as (integrationRuntimeQueue as integer),",
+				"          billingReference as (activityType as string, billableDuration as (meterType as string, duration as double, unit as string)[])",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     inferDriftedColumnTypes: true,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'arrayOfDocuments') ~> blobsource",
+				"blobsource foldDown(unroll(logs),",
+				"     mapColumn(",
+				"          id = logs.{_id},",
+				"          timestamp = logs.timestamp,",
+				"          application_id = logs.extra_info.application_id,",
+				"          application = logs.extra_info.application,",
+				"          user_id = logs.extra_info.user_id,",
+				"          user = logs.extra_info.user,",
+				"          ip = logs.ip",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flattenlogs",
+				"flattenlogs sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          id,",
+				"          timestamp,",
+				"          application_id,",
+				"          application,",
+				"          user_id,",
+				"          user,",
+				"          ip",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}
